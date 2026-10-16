@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="px" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ea8ff"/>
+      <stop offset="1" stop-color="#5de4c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#0a0a0f"/>
+  <!-- pixelated "A" on an 8x8 grid (7px cells) -->
+  <g fill="url(#px)">
+    <rect x="18" y="4" width="28" height="7"/>
+    <rect x="11" y="11" width="42" height="7"/>
+    <rect x="4" y="18" width="14" height="7"/>
+    <rect x="46" y="18" width="14" height="7"/>
+    <rect x="4" y="25" width="14" height="7"/>
+    <rect x="46" y="25" width="14" height="7"/>
+    <rect x="4" y="32" width="56" height="7"/>
+    <rect x="4" y="39" width="56" height="7"/>
+    <rect x="4" y="46" width="14" height="7"/>
+    <rect x="46" y="46" width="14" height="7"/>
+    <rect x="4" y="53" width="14" height="7"/>
+    <rect x="46" y="53" width="14" height="7"/>
+  </g>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- PLACEHOLDER OpenGraph image — replace with a 1200x630 PNG/JPG and update index.html meta tags -->
+  <defs>
+    <linearGradient id="og" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1120"/>
+      <stop offset="1" stop-color="#050507"/>
+    </linearGradient>
+    <linearGradient id="ogac" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#6ea8ff"/>
+      <stop offset="1" stop-color="#5de4c7"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#og)"/>
+  <circle cx="980" cy="140" r="300" fill="#6ea8ff" opacity="0.12"/>
+  <text x="80" y="300" font-family="'Space Grotesk',Arial" font-size="78" font-weight="700" fill="#f5f5f2">Adway Ujjwal</text>
+  <text x="84" y="368" font-family="Arial" font-size="34" fill="url(#ogac)">Senior Software Engineer</text>
+  <text x="84" y="420" font-family="Arial" font-size="24" fill="#8a94a6">Scalable systems · intelligent products · delightful interfaces</text>
+</svg>
