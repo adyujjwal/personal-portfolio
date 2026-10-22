@@ -1,7 +1,7 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
 import { SmoothScroll } from './components/common/SmoothScroll'
 import { CustomCursor } from './components/common/CustomCursor'
-import { LoadingScreen } from './components/common/LoadingScreen'
+import { PreloaderIntro } from './components/common/PreloaderIntro'
 import { Navbar } from './components/layout/Navbar'
 import { Footer } from './components/layout/Footer'
 import { Hero } from './components/hero/Hero'
@@ -21,37 +21,24 @@ const Contact = lazy(() =>
   import('./components/contact/Contact').then((m) => ({ default: m.Contact })),
 )
 
-function useIntroLoader() {
-  const [progress, setProgress] = useState(0)
-  const [done, setDone] = useState(false)
-
-  useEffect(() => {
-    const start = performance.now()
-    const MIN = 900 // keep the intro brief but intentional
-    let raf = 0
-    const tick = () => {
-      const elapsed = performance.now() - start
-      const pct = Math.min(100, (elapsed / MIN) * 100)
-      setProgress(pct)
-      if (pct < 100) raf = requestAnimationFrame(tick)
-      else setTimeout(() => setDone(true), 250)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
-
-  return { progress, done }
-}
-
 export default function App() {
-  const { progress, done } = useIntroLoader()
+  // Flipped by the preloader intro-reveal once the page is unveiled.
+  const [revealed, setRevealed] = useState(false)
+
+  // Lock scrolling until the reveal completes.
+  useEffect(() => {
+    document.body.style.overflow = revealed ? '' : 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [revealed])
 
   return (
-    <SmoothScroll>
-      <LoadingScreen progress={progress} done={done} />
+    <SmoothScroll start={revealed}>
+      <PreloaderIntro onReveal={() => setRevealed(true)} />
       <CustomCursor />
 
-      <div className="grain relative">
+      <div className="grain relative" data-reveal-root>
         <a
           href="#experience"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[200] focus:rounded-full focus:bg-bone-100 focus:px-4 focus:py-2 focus:text-sm focus:text-ink-950"
@@ -62,7 +49,7 @@ export default function App() {
         <Navbar />
 
         <main>
-          <Hero started={done} />
+          <Hero started={revealed} />
           <Suspense fallback={<div className="h-px" />}>
             <Experience />
             <Projects />

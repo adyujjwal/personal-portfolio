@@ -76,16 +76,14 @@ export function Hero({ started = true }: { started?: boolean }) {
           </span>
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={started ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 1, delay: 0.3, ease: EASE }}
+        <h1
+          data-hero-heading
           className="font-display font-bold leading-[0.95] tracking-tight text-bone-100"
           style={{ fontSize: 'clamp(3.5rem, 10.5vw, 11rem)' }}
         >
           Hi, I'm{' '}
           <span style={{ color: '#5de4c7' }}>{profile.firstName}.</span>
-        </motion.h1>
+        </h1>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

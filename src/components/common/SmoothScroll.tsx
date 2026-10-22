@@ -2,12 +2,16 @@ import { useEffect, type ReactNode } from 'react'
 import Lenis from 'lenis'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
-/** Lightweight smooth scrolling via Lenis; disabled under reduced-motion. */
-export function SmoothScroll({ children }: { children: ReactNode }) {
+/**
+ * Lightweight smooth scrolling via Lenis; disabled under reduced-motion.
+ * `start` gates initialisation so smooth scroll only begins after the
+ * preloader intro-reveal completes.
+ */
+export function SmoothScroll({ children, start = true }: { children: ReactNode; start?: boolean }) {
   const reduced = useReducedMotion()
 
   useEffect(() => {
-    if (reduced) return
+    if (reduced || !start) return
     const lenis = new Lenis({
       duration: 1.1,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -24,7 +28,7 @@ export function SmoothScroll({ children }: { children: ReactNode }) {
       cancelAnimationFrame(raf)
       lenis.destroy()
     }
-  }, [reduced])
+  }, [reduced, start])
 
   return <>{children}</>
 }

@@ -44,7 +44,7 @@ export function HeroScene({ scrollRef }: HeroSceneProps) {
         <HeroExperience quality={quality} />
       </Suspense>
       {quality.postprocessing && (
-        <PostFX bloom dof={!quality.isMobile} bokehScale={3} focalLength={0.04} />
+        <PostFX bloom dof={quality.tier === 'high'} bokehScale={2} focalLength={0.04} />
       )}
     </LazyCanvas>
   )

@@ -24,10 +24,16 @@ interface SphereProps {
   color: string
   glass: boolean
   delay: number
+  /** Geometry segments (lowered on weaker devices). */
+  segments: number
+  /** Transmission sample count — the main glass cost. */
+  samples: number
+  /** Transmission render-target resolution. */
+  resolution: number
 }
 
 /** A single floating body gently pulled back toward the origin. */
-function Sphere({ position, scale, color, glass, delay }: SphereProps) {
+function Sphere({ position, scale, color, glass, delay, segments, samples, resolution }: SphereProps) {
   const api = useRef<RapierRigidBody>(null)
   const meshRef = useRef<THREE.Mesh>(null)
   const born = useRef(0)
@@ -61,7 +67,7 @@ function Sphere({ position, scale, color, glass, delay }: SphereProps) {
     >
       <BallCollider args={[scale]} />
       <mesh ref={meshRef} scale={0} castShadow receiveShadow>
-        <sphereGeometry args={[scale, 48, 48]} />
+        <sphereGeometry args={[scale, segments, segments]} />
         {glass ? (
           <MeshTransmissionMaterial
             thickness={scale * 1.2}
@@ -69,10 +75,9 @@ function Sphere({ position, scale, color, glass, delay }: SphereProps) {
             transmission={1}
             ior={1.4}
             chromaticAberration={0.04}
-            backside
             color={color}
-            resolution={256}
-            samples={6}
+            resolution={resolution}
+            samples={samples}
           />
         ) : (
           <meshStandardMaterial
@@ -107,6 +112,12 @@ function Pointer() {
 
 export function HeroExperience({ quality }: { quality: QualityProfile }) {
   const count = Math.max(6, Math.round(14 * quality.density))
+
+  // Per-tier glass + geometry cost. Transmission is the heaviest material in
+  // the scene, so sample count / resolution scale down hard on weaker devices.
+  const segments = quality.isMobile ? 24 : 32
+  const samples = quality.tier === 'high' ? 4 : 2
+  const resolution = quality.isMobile ? 64 : quality.tier === 'high' ? 160 : 128
 
   const bodies = useMemo(
     () =>
@@ -144,7 +155,14 @@ export function HeroExperience({ quality }: { quality: QualityProfile }) {
       <Physics gravity={[0, 0, 0]} timeStep="vary">
         <Pointer />
         {bodies.map(({ key, ...rest }, i) => (
-          <Sphere key={key} delay={i * 0.07} {...rest} />
+          <Sphere
+            key={key}
+            delay={i * 0.07}
+            segments={segments}
+            samples={samples}
+            resolution={resolution}
+            {...rest}
+          />
         ))}
       </Physics>
 

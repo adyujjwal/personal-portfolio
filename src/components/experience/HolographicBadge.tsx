@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import type { ExperienceItem } from '@/data/experience'
 import { useIsTouch } from '@/hooks/useMediaQuery'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cn } from '@/lib/utils'
 
 interface HolographicBadgeProps {
   item: ExperienceItem
@@ -13,7 +14,8 @@ interface HolographicBadgeProps {
 /**
  * A hanging employee ID badge: a lanyard + clip above a dark glass card that
  * leads with a large brand logo, then company name, job title and years.
- * Keeps the pointer-driven 3D tilt, hover glow and a glassy light sweep.
+ * On pointer devices it keeps a 3D tilt + light sweep on hover; on touch it
+ * comes alive with a gentle hanging sway and an always-on iridescent foil.
  */
 export function HolographicBadge({ item, index, onOpen }: HolographicBadgeProps) {
   const ref = useRef<HTMLButtonElement>(null)
@@ -55,95 +57,148 @@ export function HolographicBadge({ item, index, onOpen }: HolographicBadgeProps)
           transition: interactive ? 'transform 0.15s ease-out' : undefined,
         }}
       >
-        {/* ── Lanyard ─────────────────────────────────────────── */}
-        <div className="relative mx-auto h-[70px] w-[150px]" style={{ transform: 'translateZ(10px)' }}>
-          <svg viewBox="0 0 150 72" className="h-full w-full" aria-hidden>
-            <defs>
-              <linearGradient id={`lan-${item.id}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor={item.accent} />
-                <stop offset="1" stopColor={item.accent} stopOpacity="0.75" />
-              </linearGradient>
-            </defs>
-            <path d="M2 0 H24 L84 60 H62 Z" fill={`url(#lan-${item.id})`} />
-            <path d="M148 0 H126 L66 60 H88 Z" fill={`url(#lan-${item.id})`} />
-            <path d="M2 0 H10 L70 60 H62 Z" fill="#000" opacity="0.12" />
-            <path d="M148 0 H140 L80 60 H88 Z" fill="#fff" opacity="0.12" />
-          </svg>
-          <div className="absolute bottom-0 left-1/2 h-6 w-7 -translate-x-1/2 translate-y-1 rounded-md bg-gradient-to-b from-zinc-300 to-zinc-500 shadow-md">
-            <div className="absolute left-1/2 top-1.5 h-1 w-3.5 -translate-x-1/2 rounded-full bg-zinc-700/70" />
-          </div>
-        </div>
-
-        {/* ── Card ────────────────────────────────────────────── */}
+        {/* Lanyard + card swing together from the top (disabled under reduced motion) */}
         <div
-          className="relative mx-auto flex aspect-[2/3] w-full flex-col overflow-hidden rounded-[22px] border border-white/10 bg-gradient-to-b from-ink-700/90 to-ink-900/95 backdrop-blur-xl"
-          style={{
-            transform: 'translateZ(0)',
-            boxShadow: '0 30px 70px -25px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.08)',
-          }}
+          className={cn('relative', !reduced && 'badge-sway')}
+          style={!reduced ? { animationDelay: `${index * -1.37}s` } : undefined}
         >
-          {/* hover color glow */}
-          <div
-            className="pointer-events-none absolute -inset-6 -z-10 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-70"
-            style={{ background: `radial-gradient(circle at 50% 25%, ${item.accent}, transparent 70%)` }}
-          />
-          {/* top accent line */}
-          <div
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{ background: `linear-gradient(90deg, transparent, ${item.accent}, transparent)` }}
-          />
-          {/* lanyard slot */}
-          <div className="absolute left-1/2 top-3 h-2 w-12 -translate-x-1/2 rounded-full bg-black/40 ring-1 ring-white/10" />
-
-          {/* content */}
-          <div className="relative flex h-full flex-col items-center px-6 pb-7 pt-9">
-            {/* BIG brand logo */}
-            <div
-              className="flex h-[46%] w-full items-center justify-center rounded-2xl p-5 shadow-lg ring-1 ring-black/5"
-              style={{ background: item.logoBg }}
-            >
-              <img
-                src={item.logo}
-                alt={`${item.company} logo`}
-                className="max-h-full max-w-full object-contain drop-shadow-sm"
-                style={{ transform: `scale(${item.logoScale ?? 1})`, transformOrigin: 'center center' }}
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-
-            {/* company name */}
-            <h3 className="mt-6 text-center font-display text-xl font-semibold leading-tight text-bone-100">
-              {item.company}
-            </h3>
-            {/* job title */}
-            <p className="mt-1.5 text-center text-base font-semibold leading-snug" style={{ color: item.accent }}>
-              {item.role}
-            </p>
-
-            {/* years */}
-            <div className="mt-auto flex w-full items-center justify-center pt-5">
-              <span className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-display text-base tabular-nums tracking-wide text-bone-200">
-                {item.period}
-              </span>
-            </div>
+          {/* ── Lanyard (longer + thicker, coloured + printed per brand) ── */}
+          <div className="relative mx-auto h-[100px] w-[160px]" style={{ transform: 'translateZ(10px)' }}>
+            <svg viewBox="0 0 160 116" className="h-full w-full" aria-hidden>
+              <defs>
+                <linearGradient id={`lanShade-${item.id}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" stopColor="#000" stopOpacity="0" />
+                  <stop offset="1" stopColor="#000" stopOpacity="0.22" />
+                </linearGradient>
+                <clipPath id={`strap-${item.id}`}>
+                  <rect x="-16" y="-100" width="32" height="100" rx="5" />
+                </clipPath>
+              </defs>
+              {/* two straps splaying into a V from the clip */}
+              {[-1, 1].map((s) => {
+                const k = item.logoScale ?? 1
+                const w = 22 * k
+                const h = 14 * k
+                return (
+                  <g key={s} transform={`translate(80 100) rotate(${s * 21})`}>
+                    {/* strap body in the brand colour + depth shading */}
+                    <rect x="-16" y="-100" width="32" height="100" rx="5" fill={item.logoBg} />
+                    <rect
+                      x="-16"
+                      y="-100"
+                      width="32"
+                      height="100"
+                      rx="5"
+                      fill={`url(#lanShade-${item.id})`}
+                    />
+                    <rect x="-16" y="-100" width="5" height="100" fill="#000" opacity="0.12" />
+                    <rect x="11" y="-100" width="5" height="100" fill="#fff" opacity="0.12" />
+                    {/* repeating company-logo print, clipped to the strap */}
+                    <g clipPath={`url(#strap-${item.id})`}>
+                      {[-82, -52, -22].map((cy) => (
+                        <image
+                          key={cy}
+                          href={item.logo}
+                          x={-w / 2}
+                          y={cy - h / 2}
+                          width={w}
+                          height={h}
+                          preserveAspectRatio="xMidYMid meet"
+                        />
+                      ))}
+                    </g>
+                  </g>
+                )
+              })}
+              {/* metal clip at the base */}
+              <g>
+                <rect x="71" y="95" width="18" height="14" rx="3" fill="#c9ccd2" />
+                <rect x="71" y="95" width="18" height="5" rx="3" fill="#e9ebee" />
+                <rect x="76.5" y="90" width="7" height="7" rx="2" fill="#aab0b8" />
+              </g>
+            </svg>
           </div>
 
-          {/* bottom accent bar */}
+          {/* ── Card ────────────────────────────────────────────── */}
           <div
-            className="absolute inset-x-0 bottom-0 h-1.5"
-            style={{ background: item.accent, opacity: 0.8 }}
-          />
-
-          {/* glassy light sweep on hover */}
-          {!reduced && (
+            className="relative mx-auto flex aspect-[2/3] w-full flex-col overflow-hidden rounded-[22px] border border-white/10 bg-gradient-to-b from-ink-700/90 to-ink-900/95 backdrop-blur-xl"
+            style={{
+              transform: 'translateZ(0)',
+              boxShadow:
+                '0 40px 80px -30px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.04), inset 0 1px 0 rgba(255,255,255,0.1)',
+            }}
+          >
+            {/* hover color glow */}
             <div
-              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              style={{
-                background: `linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.14) ${tilt.gx / 2 + 25}%, transparent 65%)`,
-              }}
+              className="pointer-events-none absolute -inset-6 -z-10 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-70"
+              style={{ background: `radial-gradient(circle at 50% 25%, ${item.accent}, transparent 70%)` }}
             />
-          )}
+            {/* iridescent holographic foil (always on; sits under the content) */}
+            <div className="holo-foil pointer-events-none absolute inset-0" />
+            {/* soft top inner highlight for gloss */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/[0.09] to-transparent" />
+            {/* top accent line */}
+            <div
+              className="pointer-events-none absolute inset-x-0 top-0 h-px"
+              style={{ background: `linear-gradient(90deg, transparent, ${item.accent}, transparent)` }}
+            />
+            {/* lanyard slot */}
+            <div className="absolute left-1/2 top-3 h-2 w-12 -translate-x-1/2 rounded-full bg-black/40 ring-1 ring-white/10" />
+
+            {/* content */}
+            <div className="relative flex h-full flex-col items-center px-6 pb-7 pt-9">
+              {/* BIG brand logo */}
+              <div
+                className="relative flex h-[46%] w-full items-center justify-center overflow-hidden rounded-2xl p-5 shadow-lg ring-1 ring-white/10"
+                style={{ background: item.logoBg }}
+              >
+                {/* glossy sheen across the logo tile */}
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/10" />
+                <img
+                  src={item.logo}
+                  alt={`${item.company} logo`}
+                  className="relative max-h-full max-w-full object-contain drop-shadow-sm"
+                  style={{ transform: `scale(${item.logoScale ?? 1})`, transformOrigin: 'center center' }}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+
+              {/* company name */}
+              <h3 className="mt-6 text-center font-display text-xl font-semibold leading-tight text-bone-100">
+                {item.company}
+              </h3>
+              {/* job title */}
+              <p className="mt-1.5 text-center text-base font-semibold leading-snug" style={{ color: item.accent }}>
+                {item.role}
+              </p>
+              {/* location */}
+              <p className="mt-1 text-center text-xs tracking-wide text-bone-400">{item.location}</p>
+
+              {/* years */}
+              <div className="mt-auto flex w-full items-center justify-center pt-5">
+                <span className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 font-display text-sm tabular-nums tracking-wide text-bone-200">
+                  {item.period}
+                </span>
+              </div>
+            </div>
+
+            {/* bottom accent bar */}
+            <div
+              className="absolute inset-x-0 bottom-0 h-1.5"
+              style={{ background: item.accent, opacity: 0.85 }}
+            />
+
+            {/* glassy light sweep on hover */}
+            {!reduced && (
+              <div
+                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                  background: `linear-gradient(105deg, transparent 35%, rgba(255,255,255,0.14) ${tilt.gx / 2 + 25}%, transparent 65%)`,
+                }}
+              />
+            )}
+          </div>
         </div>
 
         {/* enter hint */}

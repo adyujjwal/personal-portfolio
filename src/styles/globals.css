@@ -155,6 +155,45 @@ body.custom-cursor * {
   mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
 }
 
+/* Holographic ID badge (mobile): gentle hanging sway + iridescent foil sheen.
+   Both are disabled automatically by the reduced-motion block below. */
+@keyframes badge-sway {
+  0%,
+  100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
+  }
+}
+.badge-sway {
+  animation: badge-sway 6s ease-in-out infinite;
+  transform-origin: top center;
+  will-change: transform;
+}
+
+@keyframes holo-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 220% 50%;
+  }
+}
+.holo-foil {
+  background-image: linear-gradient(
+    115deg,
+    transparent 15%,
+    rgba(110, 168, 255, 0.16) 34%,
+    rgba(93, 228, 199, 0.16) 50%,
+    rgba(197, 143, 255, 0.16) 66%,
+    transparent 85%
+  );
+  background-size: 220% 220%;
+  animation: holo-shift 7s linear infinite;
+  mix-blend-mode: screen;
+}
+
 /* Link underline micro-interaction */
 .link-underline {
   position: relative;

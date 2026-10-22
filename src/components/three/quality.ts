@@ -29,7 +29,7 @@ export function useQuality(): QualityProfile {
     if (isMobile) {
       return {
         tier: 'low',
-        dpr: [1, 1.5],
+        dpr: [1, 1.25],
         postprocessing: false,
         shadows: false,
         density: 0.45,
@@ -40,7 +40,7 @@ export function useQuality(): QualityProfile {
     if (isTablet || lowEnd) {
       return {
         tier: 'mid',
-        dpr: [1, 1.75],
+        dpr: [1, 1.5],
         postprocessing: !reduced,
         shadows: true,
         density: 0.7,
@@ -50,7 +50,7 @@ export function useQuality(): QualityProfile {
     }
     return {
       tier: 'high',
-      dpr: [1, 2],
+      dpr: [1, 1.75],
       postprocessing: !reduced,
       shadows: true,
       density: 1,

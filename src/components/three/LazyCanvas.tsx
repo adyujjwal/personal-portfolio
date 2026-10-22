@@ -1,6 +1,7 @@
-import { Suspense, useRef, type ReactNode } from 'react'
+import { Suspense, useRef, useState, type ReactNode } from 'react'
 import { useInView } from 'framer-motion'
 import { Canvas, type CanvasProps } from '@react-three/fiber'
+import { PerformanceMonitor, AdaptiveEvents } from '@react-three/drei'
 import { useQuality } from './quality'
 import { useWebGL } from '@/hooks/useWebGL'
 
@@ -35,12 +36,17 @@ export function LazyCanvas({
   const quality = useQuality()
   const webgl = useWebGL()
 
+  // Dynamic resolution: start at the tier's max DPR and let PerformanceMonitor
+  // scale it toward the min when the frame rate sags, recovering when it's fine.
+  const [dprMin, dprMax] = quality.dpr
+  const [dpr, setDpr] = useState(dprMax)
+
   return (
     <div ref={ref} className={className}>
       {fallback}
       {webgl && mounted && (
         <Canvas
-          dpr={quality.dpr}
+          dpr={dpr}
           frameloop={alwaysRender || onScreen ? 'always' : 'demand'}
           gl={{
             antialias: !quality.isMobile,
@@ -52,6 +58,12 @@ export function LazyCanvas({
           shadows={quality.shadows}
           {...rest}
         >
+          <PerformanceMonitor
+            onChange={({ factor }) =>
+              setDpr(Number((dprMin + (dprMax - dprMin) * factor).toFixed(2)))
+            }
+          />
+          <AdaptiveEvents />
           <Suspense fallback={null}>{children}</Suspense>
         </Canvas>
       )}
